@@ -2,6 +2,7 @@ package com.example.abbs.service;
 
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,44 +15,45 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public User getUserByUid(String uid) {
-		// TODO Auto-generated method stub
-		return null;
+		return uDao.getUser(uid);
 	}
 
 	@Override
 	public List<User> getUserList(int page) {
-		// TODO Auto-generated method stub
-		return null;
+		int offset = (page - 1 ) * COUNT_PER_PAGE;
+		return uDao.getUserList(COUNT_PER_PAGE, offset);
 	}
 
 	@Override
 	public int getUserCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return uDao.getUserCount();
 	}
 
 	@Override
 	public void registerUser(User user) {
-		// TODO Auto-generated method stub
-		
+		String hashedPwd = BCrypt.hashpw(user.getPwd(), BCrypt.gensalt());
+		user.setPwd(hashedPwd);
+		uDao.insertUser(user);
 	}
 
 	@Override
 	public void updateUser(User user) {
-		// TODO Auto-generated method stub
-		
+		uDao.updateUser(user);
 	}
 
 	@Override
 	public void deleteUser(String uid) {
-		// TODO Auto-generated method stub
-		
+		uDao.deleteUser(uid);
 	}
 
 	@Override
 	public int login(String uid, String pwd) {
-		// TODO Auto-generated method stub
-		return 0;
+		User user = uDao.getUser(uid);
+		if (user == null)
+			return USER_NOT_EXIST;
+		if (BCrypt.checkpw(pwd, user.getPwd()))
+			return CORRECT_LOGIN;
+		return WRONG_PASSWORD;
 	}
 	
 }
