@@ -17,12 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-
 @Controller
 @RequestMapping("/file")
 public class FileController {
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
-
 	
 	@GetMapping("/profile/{filename}")
 	public ResponseEntity<Resource> profile(@PathVariable String filename) {
@@ -31,7 +29,9 @@ public class FileController {
 			String contentType = Files.probeContentType(path);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentDisposition(
-					ContentDisposition.builder("attachment").filename(filename, StandardCharsets.UTF_8).build()
+					ContentDisposition.builder("attachment")
+					 				  .filename(filename, StandardCharsets.UTF_8)
+					 				  .build()
 					);
 			headers.add(HttpHeaders.CONTENT_TYPE, contentType);
 			Resource resource = new InputStreamResource(Files.newInputStream(path));
@@ -41,10 +41,11 @@ public class FileController {
 		}
 		return null;
 	}
-	
-	@GetMapping("/dwonload/{filename}")
+
+	@GetMapping("/download/{filename}")
 	public ResponseEntity<Resource> download(@PathVariable String filename) {
 		
 		return null;
 	}
+	
 }

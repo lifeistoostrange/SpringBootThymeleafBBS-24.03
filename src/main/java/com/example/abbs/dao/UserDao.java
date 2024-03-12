@@ -11,6 +11,7 @@ import com.example.abbs.entity.User;
 
 @Mapper
 public interface UserDao {
+
 	@Select("select * from users where uid=#{uid}")
 	User getUser(String uid);
 	

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImageUtil {
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
+	
 	/**
 	 * 이미지를 정사각형으로 잘라서 저장하고, 파일 이름을 반환함
 	 * @param uid
@@ -58,4 +59,5 @@ public class ImageUtil {
 		}
 		return newFname;
 	}
+	
 }

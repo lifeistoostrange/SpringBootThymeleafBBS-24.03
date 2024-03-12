@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getUserList(int page) {
-		int offset = (page - 1 ) * COUNT_PER_PAGE;
+		int offset = (page - 1) * COUNT_PER_PAGE;
 		return uDao.getUserList(COUNT_PER_PAGE, offset);
 	}
 
@@ -55,5 +55,5 @@ public class UserServiceImpl implements UserService {
 			return CORRECT_LOGIN;
 		return WRONG_PASSWORD;
 	}
-	
+
 }
