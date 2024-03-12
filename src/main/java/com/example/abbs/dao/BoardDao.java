@@ -18,8 +18,8 @@ public interface BoardDao {
 	Board getBoard(int bid);
 	
 	@Select("select count(b.bid) from board b"
-	         + " JOIN users u ON b.uid=u.uid"
-	         + " where b.isDeleted=0 and ${field} like #{query}")
+			+ " JOIN users u ON b.uid=u.uid"
+			+ " where b.isDeleted=0 and ${field} like #{query}")
 	int getBoardCount(String field, String query);
 	
 	@Select("SELECT b.*, u.uname FROM board b"
