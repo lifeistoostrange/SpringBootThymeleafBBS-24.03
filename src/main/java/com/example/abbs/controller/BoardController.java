@@ -2,7 +2,9 @@ package com.example.abbs.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +36,7 @@ public class BoardController {
 	@Autowired private LikeService likeService;
 	@Autowired private JsonUtil jsonUtil;
 	@Value("${spring.servlet.multipart.location}") private String uploadDir;
+	private String menu = "board";
 
 	@GetMapping("/list")
 	public String list(@RequestParam(name="p", defaultValue="1") int page,
@@ -58,12 +61,14 @@ public class BoardController {
 		model.addAttribute("startPage", startPage);
 		model.addAttribute("endPage", endPage);
 		model.addAttribute("pageList", pageList);
+		model.addAttribute("menu", menu);
 		
 		return "board/list";
 	}
 	
 	@GetMapping("/insert")
-	public String insertForm() {
+	public String insertForm(Model model) {
+		model.addAttribute("menu", menu);
 		return "board/insert";
 	}
 	
@@ -110,10 +115,18 @@ public class BoardController {
 			model.addAttribute("fileList", fileList);
 		}
 		model.addAttribute("board", board);
+		
+		// 좋아요 처리
+		Like like = likeService.getLike(bid, sessUid);
+		if (like == null)
+			session.setAttribute("likeClicked", 0);
+		else
+			session.setAttribute("likeClicked", like.getValue());
 		model.addAttribute("count", board.getLikeCount());
 		
 		List<Reply> replyList = replyService.getReplyList(bid);
 		model.addAttribute("replyList", replyList);
+		model.addAttribute("menu", menu);
 		return "board/detail";
 	}
 	
@@ -135,17 +148,20 @@ public class BoardController {
 		return "redirect:/board/detail/" + bid + "/" + uid + "?option=DNI";
 	}
 	
-	// AJAX 처리
+	// AJAX 처리 - 타임리프에서 세팅하는 값을 변경하기 위한 방법
 	@GetMapping("/like/{bid}")
 	public String like(@PathVariable int bid, HttpSession session, Model model) {
 		String sessUid = (String) session.getAttribute("sessUid");
 		Like like = likeService.getLike(bid, sessUid);
-		if (like == null)
+		if (like == null) {
 			likeService.insertLike(new Like(sessUid, bid, 1));
-		else
-			likeService.toggleLike(like);
+			session.setAttribute("likeClicked", 1);
+		} else {
+			int value = likeService.toggleLike(like);
+			session.setAttribute("likeClicked", value);
+		}
 		int count = likeService.getLikeCount(bid);
-//		boardService.		board.likeCount update!!!
+		boardService.updateLikeCount(bid, count);
 		model.addAttribute("count", count);
 		return "board/detail::#likeCount";
 	}
